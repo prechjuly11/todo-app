@@ -2,33 +2,6 @@
 
 A Node.js/Express todo app that uses the **Factory Design Pattern** to switch between MongoDB Atlas and Supabase (PostgreSQL) via a single environment variable.
 
-## Project Structure
-
-```
-todo-app/
-├── app.js                          # Express entry point
-├── routes/
-│   └── todos.js                    # CRUD routes
-├── views/
-│   ├── layouts/main.hbs            # Base layout
-│   ├── index.hbs                   # Todo list page
-│   └── error.hbs                   # Error page
-├── public/
-│   └── css/style.css
-├── lib/
-│   └── database/
-│       ├── DatabaseProvider.js         # Abstract base class
-│       ├── MongoDBProvider.js          # MongoDB implementation
-│       ├── SupabaseProvider.js         # Supabase implementation
-│       ├── createDatabaseProvider.js   # Factory function
-│       └── models/
-│           ├── mongoModels.js          # Mongoose schema
-│           └── supabaseModels.js       # Supabase table helpers
-├── .env.example
-├── .gitignore
-└── package.json
-```
-
 ## Setup
 
 ### 1. Install dependencies
@@ -74,21 +47,3 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
-
-## How the Factory Pattern Works
-
-`createDatabaseProvider.js` reads `DB_TYPE` from `.env` and returns the matching provider:
-
-```
-DB_TYPE=mongodb   → new MongoDBProvider()
-DB_TYPE=supabase  → new SupabaseProvider()
-```
-
-Both extend `DatabaseProvider` and implement the same interface:
-- `getTodos()`
-- `createTodo(text)`
-- `updateTodo(id, updates)`
-- `deleteTodo(id)`
-- `toggleTodo(id)`
-
-The rest of the application (`app.js`, routes) only ever calls these methods — it never knows which database is running underneath.
