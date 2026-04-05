@@ -1,0 +1,85 @@
+<header class="app-header">
+  <h1>Todos</h1>
+  <span class="db-badge">{{dbType}}</span>
+</header>
+
+<!-- Add Todo Form -->
+<section class="add-section">
+  <form action="/todos" method="POST" class="add-form">
+    <input
+      type="text"
+      name="text"
+      placeholder="What needs to be done?"
+      autocomplete="off"
+      required
+    />
+    <button type="submit">Add</button>
+  </form>
+</section>
+
+<!-- Stats -->
+{{#if stats.total}}
+<div class="stats">
+  <span>{{stats.total}} total</span>
+  <span class="dot">·</span>
+  <span>{{stats.remaining}} remaining</span>
+  <span class="dot">·</span>
+  <span>{{stats.completed}} done</span>
+</div>
+{{/if}}
+
+<!-- Todo List -->
+<ul class="todo-list">
+  {{#each todos}}
+  <li class="todo-item {{#if completed}}completed{{/if}}">
+
+    <!-- Toggle completion -->
+    <form action="/todos/{{id}}/toggle" method="POST" class="inline-form">
+      <button type="submit" class="toggle-btn" title="Toggle complete">
+        {{#if completed}}✓{{else}}<span class="empty-check"></span>{{/if}}
+      </button>
+    </form>
+
+    <!-- Inline edit form (hidden by default, shown via JS) -->
+    <span class="todo-text" data-id="{{id}}">{{text}}</span>
+
+    <form action="/todos/{{id}}/edit" method="POST" class="edit-form hidden" id="edit-form-{{id}}">
+      <input type="text" name="text" value="{{text}}" required />
+      <button type="submit">Save</button>
+      <button type="button" class="cancel-edit" data-id="{{id}}">Cancel</button>
+    </form>
+
+    <!-- Actions -->
+    <div class="todo-actions">
+      <button class="edit-btn" data-id="{{id}}" title="Edit">✎</button>
+      <form action="/todos/{{id}}/delete" method="POST" class="inline-form">
+        <button type="submit" class="delete-btn" title="Delete">✕</button>
+      </form>
+    </div>
+
+  </li>
+  {{else}}
+  <li class="empty-state">No todos yet. Add one above.</li>
+  {{/each}}
+</ul>
+
+<script>
+  // Inline edit toggle
+  document.querySelectorAll('.edit-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      document.querySelector(`[data-id="${id}"].todo-text`).classList.add('hidden');
+      document.getElementById(`edit-form-${id}`).classList.remove('hidden');
+      btn.closest('.todo-actions').classList.add('hidden');
+    });
+  });
+
+  document.querySelectorAll('.cancel-edit').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      document.querySelector(`[data-id="${id}"].todo-text`).classList.remove('hidden');
+      document.getElementById(`edit-form-${id}`).classList.add('hidden');
+      document.querySelector(`.edit-btn[data-id="${id}"]`).closest('.todo-actions').classList.remove('hidden');
+    });
+  });
+</script>
